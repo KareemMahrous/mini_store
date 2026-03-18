@@ -1,0 +1,290 @@
+{
+    "info": {
+        "name": "Products API",
+        "description": "API collection for Products and Wishlist management",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "authToken",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Mahrous\",\n  \"email\": \"mahrous@example.com\",\n  \"password\": \"secret123\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:3000/auth/register",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000",
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new user and receive a JWT token."
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const responseJson = pm.response.json();",
+                                    "const token = responseJson?.data?.token;",
+                                    "",
+                                    "pm.test(\"Register returns a token\", function () {",
+                                    "    pm.expect(token).to.be.a(\"string\").and.not.empty;",
+                                    "});",
+                                    "",
+                                    "if (token) {",
+                                    "    pm.collectionVariables.set(\"authToken\", token);",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "response": []
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"mahrous@example.com\",\n  \"password\": \"secret123\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:3000/auth/login",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000",
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login with email and password and receive a JWT token."
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "const responseJson = pm.response.json();",
+                                    "const token = responseJson?.data?.token;",
+                                    "",
+                                    "pm.test(\"Login returns a token\", function () {",
+                                    "    pm.expect(token).to.be.a(\"string\").and.not.empty;",
+                                    "});",
+                                    "",
+                                    "if (token) {",
+                                    "    pm.collectionVariables.set(\"authToken\", token);",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Products",
+            "item": [
+                {
+                    "name": "Get All Products",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "description": "Language: en or ar"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer <paste-jwt-token-here>",
+                                "description": "Optional JWT bearer token returned from login/register."
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:3000/products",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000",
+                            "path": [
+                                "products"
+                            ]
+                        },
+                        "description": "Fetch all products\n\nSupported headers:\n- Accept-Language: en (English) or ar (Arabic)\n- Authorization: Optional. If a valid JWT is provided, each product includes isInWishlist."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Product By ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "description": "Language: en or ar"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer <paste-jwt-token-here>",
+                                "description": "Optional JWT bearer token returned from login/register."
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:3000/products/1",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000",
+                            "path": [
+                                "products",
+                                "1"
+                            ]
+                        },
+                        "description": "Fetch a single product by ID\n\nHeaders:\n- Accept-Language: en (English) or ar (Arabic)\n- Authorization: Optional. If a valid JWT is provided, the product includes isInWishlist.\n\nPath parameters:\n- id: Product ID (required)"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Wishlist",
+            "auth": {
+                "type": "bearer",
+                "bearer": [
+                    {
+                        "key": "token",
+                        "value": "{{authToken}}",
+                        "type": "string"
+                    }
+                ]
+            },
+            "item": [
+                {
+                    "name": "Add Product to Wishlist",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"productId\": 2\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:3000/wishlist/add",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000",
+                            "path": [
+                                "wishlist",
+                                "add"
+                            ]
+                        },
+                        "description": "Add a product to the authenticated user's wishlist\n\nHeaders:\n- Authorization: Required JWT token\n\nBody parameters (required):\n- productId: Product ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Remove Product from Wishlist",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"productId\": 2\n}"
+                        },
+                        "url": {
+                            "raw": "http://localhost:3000/wishlist/remove",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000",
+                            "path": [
+                                "wishlist",
+                                "remove"
+                            ]
+                        },
+                        "description": "Remove a product from the authenticated user's wishlist\n\nHeaders:\n- Authorization: Required JWT token\n\nBody parameters (required):\n- productId: Product ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get My Wishlist",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept-Language",
+                                "value": "en",
+                                "description": "Language: en or ar"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://localhost:3000/wishlist",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000",
+                            "path": [
+                                "wishlist"
+                            ]
+                        },
+                        "description": "Fetch the authenticated user's wishlist\n\nHeaders:\n- Accept-Language: en (English) or ar (Arabic)\n- Authorization: Required JWT token"
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}
